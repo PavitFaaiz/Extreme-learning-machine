@@ -1,30 +1,38 @@
 from ELM import *
 from sklearn.datasets import fetch_mldata
 from utils import *
+from data_set .load_dataset import *
 import os
 
 #Use only CPU
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
-#Prepare MNIST dataset
-mnist = fetch_mldata("MNIST original")
-x, y = mnist.data / 255., mnist.target #Normalize data into [0, 1] range
-indices = np.arange(60000)
-num_train = 60000
-
-#Shift values to be in [-1, 1] range
-train_samples = x[indices[0:num_train]]*2-1
-train_labels = to_categorical(y[indices[0:num_train]])*2-1
-test_samples = x[60000:70000]*2-1
-test_labels = to_categorical(y[60000:70000])*2-1
-
-input_dim = 784
-output_dim = 10
-hidden_nodes = 1000
-gamma = 1
+#Prepare dataset
+'''
+    Dataset names
+    - MNIST
+    - FASHION_MNIST
+    - CIFAR-10
+    - CALTECH-SIL
+    - IRIS
+    - NORB
+    - WINE
+'''
+data = load_dataset("CIFAR-10")
+train_samples = data["train_samples"]
+train_labels = data["train_labels"]
+test_samples = data["test_samples"]
+test_labels = data["test_labels"]
+num_train = data["num_train"]
+num_test = len(test_labels)
+input_shape = data["input_shape"]
+num_classes = len(test_labels[0])
 
 #Creating ELM object
+hidden_nodes = 1000
+input_dim = np.prod(input_shape)
+output_dim = num_classes
 elm = ELM(input_dim, output_dim, hidden_nodes, gamma=1)
 
 #Training
